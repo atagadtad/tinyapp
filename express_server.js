@@ -1,7 +1,9 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
+const bodyParser = require("body-parser");
 
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 const urlDatabase = {
@@ -26,6 +28,15 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+app.post("/urls", (req, res) => {
+  console.log(req.body);
+  res.send("Ok");
+})
+
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+})
+
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase };
   res.render("urls_show", templateVars);
@@ -34,3 +45,22 @@ app.get("/urls/:shortURL", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 })
+
+function randomLetter(c) {
+  if (c < 256) {
+    return Math.abs(c).toString(16);
+  }
+  return 0;
+}
+
+function generatedRandomString() {
+  let sixString = '';
+  for (i = 0; sixString.length < 6; i++) {
+    sixString += randomLetter(Math.round(Math.random() * 256));
+  }
+  return sixString;
+};
+
+
+
+console.log(generatedRandomString());
