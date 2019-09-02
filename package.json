@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/atagadtad/tinyapp/issues"
   },
-  "homepage": "https://github.com/atagadtad/tinyapp#readme"
+  "homepage": "https://github.com/atagadtad/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
