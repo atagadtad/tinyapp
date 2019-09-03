@@ -48,13 +48,22 @@ app.get("/urls/new", (req, res) => {
 })
 
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase };
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 })
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
+})
+
+app.post("/urls/:shortURL", (req, res) => {
+  let shortURL = req.params.shortURL
+  let longURL = req.body.longURL
+  console.log(shortURL)
+  console.log(longURL)
+  urlDatabase[shortURL] = longURL;
+  res.redirect(`/urls/${shortURL}`);
 })
 
 app.listen(PORT, () => {
