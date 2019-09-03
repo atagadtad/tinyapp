@@ -8,13 +8,16 @@ app.set("view engine", "ejs");
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.ggogle.com"
+  "9sm5xK": "http://www.google.com"
+
 };
 
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+// when asked for /urls.json in the browser, server responeds with the
+// .json of the urlDatabase object
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
@@ -30,8 +33,15 @@ app.get("/urls", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body);
-  res.send("Ok");
-})
+  let temporaryString = generatedRandomString()
+  urlDatabase[temporaryString] = req.body.longURL;
+  res.redirect(`/urls/${temporaryString}`)
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+});
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
@@ -60,7 +70,3 @@ function generatedRandomString() {
   }
   return sixString;
 };
-
-
-
-console.log(generatedRandomString());
