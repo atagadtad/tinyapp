@@ -67,7 +67,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/new", (req, res) => {
   let userID = req.cookies.user_id;
   let templateVars = {
-    user: req.cookies[userID]
+    user: users[userID]
   }
   res.render("urls_new", templateVars);
 })
@@ -78,7 +78,7 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    user: req.cookies[userID]
+    user: users[userID]
   };
   res.render("urls_show", templateVars);
 })
@@ -87,30 +87,31 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/register", (req, res) => {
   let userID = req.cookies.user_id;
   let templateVars = {
-    user: req.cookies[userID]
+    user: users[userID]
   }
   console.log(req.body);
   res.render("urls_registration", templateVars)
 })
 
+// created cookie:
 app.post("/register", (req, res) => {
   let randomID = generatedRandomString();
   let userEmail = req.body.email;
   let userPassword = req.body.password;
-  res.cookie("user_id", randomID)
-
-  users[randomID] = { id: randomID, email: userEmail, password: userPassword }
 
   if (userEmail === '' || userPassword === '') {
-    console.log('hai')
     res.statusCode = 400;
     res.end("ERROR 400, PLEASE INPUT VALID EMAIL AND/OR PASSWORD")
+    return;
   }
   if (emailFinder(users, userEmail)) {
     res.statusCode = 400;
     res.end("EMAIL ALREADY FOUND IN DATABASE!")
+    return;
   }
-
+  res.cookie("user_id", randomID)
+  users[randomID] = { id: randomID, email: userEmail, password: userPassword }
+  // console.log(users)
   res.redirect("/urls")
 })
 
@@ -128,14 +129,29 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 })
 
+// cookie:
+app.get("/login", (req, res) => {
+  let userID = req.cookies.user_id;
+  let templateVars = {
+    user: users[userID]
+  }
+  res.render("urls_login", templateVars);
+})
+
 app.post("/login", (req, res) => {
-  console.log(req.body)
-  res.cookie("username", req.body.user_id)
+  let userEmail = req.body.email;
+  let userID = idFinder(users, userEmail);
+  console.log(req.body.email)
+  console.log(users[userID]["email"]);
+  console.log(emailFinder(users, userEmail))
+
   res.redirect("/urls")
 })
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id', req.cookies["username"]);
+  let userID = req.cookies.user_id;
+  res.clearCookie('user_id', req.cookies[userID]);
+  console.log(users)
   res.redirect("/urls");
 })
 
@@ -160,12 +176,20 @@ function generatedRandomString() {
 
 // true if it finds matching email, false if it doesn't
 function emailFinder(userObject, email) {
+  let objFilter = Object.values(userObject);
+  for (user of objFilter) {
+    if (user.email === email) {
+      return true;
+    }
+  }
+  return false;
+};
+
+function idFinder(userObject, email) {
   let objFilter = Object.values(Object.values(userObject))
   for (element of objFilter) {
     if (element.email === email) {
-      return true;
-    } else {
-      return false;
+      return element.id;
     }
   }
 };

@@ -10,28 +10,22 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
         <a class="nav-item nav-link" href="/register">Register</a>
+        <%if (!user) {%>
+        <a class="nav-item nav-link" href="/login">Login</a>
+        <%}%>
       </div>
       <div>
         <label>
           <%if (user) {%>
-          <form method="POST" action="/logout">
-            <div>
-              <button type="submit" class="btn btn-secondary"> Signout
-              </button>
-              <%= user.email %>
-            </div>
-          </form>
-          <%}
-              %>
-          <%if (!user) {%>
-          <form method="POST" action="/login">
-            <div class="form-row">
-              <input name="username" placeholder="Username">
-              <button type="submit" class="btn btn-primary">Submit</button>
-          </form>
-      </div>
-      <%}%>
-             </label>
+        <form method="POST" action="/logout">
+          <div>
+            <button type="submit" class="btn btn-secondary"> Logout
+            </button>
+            <%= user.email %>
+          </div>
+        </form>
+        <%}%>
+    </label>
       </div>
     </div>
   </nav>
