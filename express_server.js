@@ -141,9 +141,12 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   let userEmail = req.body.email;
   let userID = idFinder(users, userEmail);
-  console.log(req.body.email)
-  console.log(users[userID]["email"]);
-  console.log(emailFinder(users, userEmail))
+  if (!emailFinder(users, userEmail)) {
+    res.statusCode = 403;
+    res.end("ERROR: 403. EMAIL NOT FOUND!")
+    return;
+  } else
+    res.cookie("user_id", users[userID]["id"])
 
   res.redirect("/urls")
 })
