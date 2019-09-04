@@ -14,6 +14,19 @@ const urlDatabase = {
 
 };
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+};
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
@@ -30,9 +43,10 @@ app.get("/hello", (req, res) => {
 
 //cookie:
 app.get("/urls", (req, res) => {
+  let userID = req.cookies.user_id;
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user: users[userID]
   };
   res.render("urls_index", templateVars);
 });
@@ -51,20 +65,53 @@ app.get("/u/:shortURL", (req, res) => {
 
 //cookie:
 app.get("/urls/new", (req, res) => {
+  let userID = req.cookies.user_id;
   let templateVars = {
-    username: req.cookies["username"]
+    user: req.cookies[userID]
   }
   res.render("urls_new", templateVars);
 })
 
 // cookie:
 app.get("/urls/:shortURL", (req, res) => {
+  let userID = req.cookies.user_id;
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"]
+    user: req.cookies[userID]
   };
   res.render("urls_show", templateVars);
+})
+
+// cookie:
+app.get("/register", (req, res) => {
+  let userID = req.cookies.user_id;
+  let templateVars = {
+    user: req.cookies[userID]
+  }
+  console.log(req.body);
+  res.render("urls_registration", templateVars)
+})
+
+app.post("/register", (req, res) => {
+  let randomID = generatedRandomString();
+  let userEmail = req.body.email;
+  let userPassword = req.body.password;
+  res.cookie("user_id", randomID)
+
+  users[randomID] = { id: randomID, email: userEmail, password: userPassword }
+
+  if (userEmail === '' || userPassword === '') {
+    console.log('hai')
+    res.statusCode = 400;
+    res.end("ERROR 400, PLEASE INPUT VALID EMAIL AND/OR PASSWORD")
+  }
+  if (emailFinder(users, userEmail)) {
+    res.statusCode = 400;
+    res.end("EMAIL ALREADY FOUND IN DATABASE!")
+  }
+
+  res.redirect("/urls")
 })
 
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -82,12 +129,13 @@ app.post("/urls/:shortURL", (req, res) => {
 })
 
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username)
+  console.log(req.body)
+  res.cookie("username", req.body.user_id)
   res.redirect("/urls")
 })
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username', req.cookies["username"]);
+  res.clearCookie('user_id', req.cookies["username"]);
   res.redirect("/urls");
 })
 
@@ -109,3 +157,16 @@ function generatedRandomString() {
   }
   return sixString;
 };
+
+// true if it finds matching email, false if it doesn't
+function emailFinder(userObject, email) {
+  let objFilter = Object.values(Object.values(userObject))
+  for (element of objFilter) {
+    if (element.email === email) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+};
+
