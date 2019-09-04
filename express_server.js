@@ -9,16 +9,16 @@ app.set("view engine", "ejs");
 app.use(cookieParser());
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
 };
 
+
 const users = {
-  "userRandomID": {
+  "aJ48lW": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: "asdf"
   },
   "user2RandomID": {
     id: "user2RandomID",
@@ -45,21 +45,23 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
   let userID = req.cookies.user_id;
   let templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUser(userID),
     user: users[userID]
   };
   res.render("urls_index", templateVars);
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
+  let userID = req.cookies.user_id;
   let temporaryString = generatedRandomString()
-  urlDatabase[temporaryString] = req.body.longURL;
+  urlDatabase[temporaryString] = { longURL: req.body.longURL, userID: userID };
   res.redirect(`/urls/${temporaryString}`)
+  console.log(urlDatabase)
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL]['longURL'];
   res.redirect(longURL);
 });
 
@@ -75,9 +77,10 @@ app.get("/urls/new", (req, res) => {
 // cookie:
 app.get("/urls/:shortURL", (req, res) => {
   let userID = req.cookies.user_id;
+  console.log(req.params)
   let templateVars = {
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL]['longURL'],
     user: users[userID]
   };
   res.render("urls_show", templateVars);
@@ -205,3 +208,15 @@ function idFinder(userObject, email) {
   }
 };
 
+function urlsForUser(id) {
+  let urlArray = [];
+  let urlFilter = Object.values(urlDatabase);
+  for (url of urlFilter) {
+    if (url.userID === id) {
+      urlArray.push(url.longURL)
+    }
+  }
+  return urlArray;
+}
+
+// console.log(urlsForUser("aJ48lW"))
