@@ -141,15 +141,23 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   let userEmail = req.body.email;
   let userID = idFinder(users, userEmail);
+  let userPWD = req.body.password;
+
   if (!emailFinder(users, userEmail)) {
     res.statusCode = 403;
     res.end("ERROR: 403. EMAIL NOT FOUND!")
     return;
-  } else
-    res.cookie("user_id", users[userID]["id"])
+  } else if (emailFinder(users, userEmail))
+    if (users[userID].password !== userPWD) {
+      res.statusCode = 403;
+      res.end("ERROR: 403. WRONG PASSWORD!")
+      return;
+    } else {
+      res.cookie("user_id", users[userID]["id"])
+    }
 
   res.redirect("/urls")
-})
+});
 
 app.post("/logout", (req, res) => {
   let userID = req.cookies.user_id;
