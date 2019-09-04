@@ -162,7 +162,7 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   let userID = req.cookies.user_id;
   res.clearCookie('user_id', req.cookies[userID]);
-  console.log(users)
+  // console.log(users)
   res.redirect("/urls");
 })
 
