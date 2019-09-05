@@ -147,7 +147,7 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 });
 
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.delete("/urls/:shortURL/delete", (req, res) => {
   let userID = req.session.user_id;
   if (!userID) {
     res.statusCode = 401;
