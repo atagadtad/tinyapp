@@ -4,7 +4,10 @@ const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
-const { getUserByEmail } = require('./helpers');
+const { getUserByEmail,
+  generatedRandomString,
+  idFinder,
+  urlsForUser } = require('./helpers');
 
 
 app.use(cookieSession({
@@ -62,7 +65,7 @@ app.get("/urls", (req, res) => {
   let userID = req.session.user_id;
 
   let templateVars = {
-    urls: urlsForUser(userID),
+    urls: urlsForUser(userID, urlDatabase),
     user: users[userID]
   };
   res.render("urls_index", templateVars);
@@ -208,38 +211,6 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-function randomLetter(c) {
-  if (c < 256) {
-    return Math.abs(c).toString(16);
-  }
-  return 0;
-}
 
-function generatedRandomString() {
-  let sixString = '';
-  for (let i = 0; sixString.length < 6; i++) {
-    sixString += randomLetter(Math.round(Math.random() * 256));
-  }
-  return sixString;
-}
-
-function idFinder(userObject, email) {
-  let objFilter = Object.values(Object.values(userObject));
-  for (let element of objFilter) {
-    if (element.email === email) {
-      return element.id;
-    }
-  }
-}
-
-function urlsForUser(id) {
-  let urlObj = {};
-  for (let shortURL in urlDatabase) {
-    if (urlDatabase[shortURL]['userID'] === id) {
-      urlObj[shortURL] = urlDatabase[shortURL]['longURL'];
-    }
-  }
-  return urlObj;
-}
 
 
