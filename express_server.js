@@ -2,16 +2,24 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser');
+// const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session')
 const bcrypt = require('bcrypt');
 
 // const password = "purple-monkey-dinosaur";
 // const hashedPassword = bcrypt.hashSync(password, 10);
 // console.log(hashedPassword);
+// app.use(cookieParser());
 
+app.use(cookieSession({
+  name: 'session',
+  keys: [/* secret keys */],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
-app.use(cookieParser());
 
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
@@ -48,7 +56,6 @@ app.get("/hello", (req, res) => {
 
 //cookie:
 app.get("/urls", (req, res) => {
-  let userObj = {}
   let userID = req.cookies.user_id;
   let templateVars = {
     urls: urlsForUser(userID),
@@ -155,6 +162,7 @@ app.get("/login", (req, res) => {
   res.render("urls_login", templateVars);
 })
 
+// set cookie for userID
 app.post("/login", (req, res) => {
   let userEmail = req.body.email;
   let userID = idFinder(users, userEmail);
