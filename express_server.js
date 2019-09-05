@@ -4,6 +4,7 @@ const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
+const methodOverride = require('method-override');
 
 // helper functions:
 const { getUserByEmail,
@@ -11,7 +12,7 @@ const { getUserByEmail,
   idFinder,
   urlsForUser } = require('./helpers');
 
-
+app.use(methodOverride('_method'));
 app.use(cookieSession({
   name: 'user_id',
   keys: ['id'],
