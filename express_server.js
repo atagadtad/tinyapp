@@ -12,8 +12,8 @@ const bcrypt = require('bcrypt');
 // app.use(cookieParser());
 
 app.use(cookieSession({
-  name: 'session',
-  keys: [/* secret keys */],
+  name: 'user_id',
+  keys: ['id'],
 
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
@@ -56,7 +56,7 @@ app.get("/hello", (req, res) => {
 
 //cookie:
 app.get("/urls", (req, res) => {
-  let userID = req.cookies.user_id;
+  let userID = req.session.user_id;
   let templateVars = {
     urls: urlsForUser(userID),
     user: users[userID]
@@ -66,7 +66,7 @@ app.get("/urls", (req, res) => {
 
 app.post("/urls", (req, res) => {
   // console.log(req.body);
-  let userID = req.cookies.user_id;
+  let userID = req.session.user_id;
   let temporaryString = generatedRandomString()
   urlDatabase[temporaryString] = { longURL: req.body.longURL, userID: userID };
   res.redirect(`/urls/${temporaryString}`)
@@ -80,7 +80,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 //cookie:
 app.get("/urls/new", (req, res) => {
-  let userID = req.cookies.user_id;
+  let userID = req.session.user_id;
   let templateVars = {
     user: users[userID]
   }
@@ -89,7 +89,7 @@ app.get("/urls/new", (req, res) => {
 
 // cookie:
 app.get("/urls/:shortURL", (req, res) => {
-  let userID = req.cookies.user_id;
+  let userID = req.session.user_id;
   console.log(req.params)
   let templateVars = {
     shortURL: req.params.shortURL,
@@ -101,7 +101,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 // cookie:
 app.get("/register", (req, res) => {
-  let userID = req.cookies.user_id;
+  let userID = req.session.user_id;
   let templateVars = {
     user: users[userID]
   }
@@ -126,14 +126,14 @@ app.post("/register", (req, res) => {
     res.end("EMAIL ALREADY FOUND IN DATABASE!")
     return;
   }
-  res.cookie("user_id", randomID)
+  req.session.user_id = randomID;
   users[randomID] = { id: randomID, email: userEmail, password: hashedPassword }
   // console.log(users)
   res.redirect("/urls")
 })
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  let userID = req.cookies.user_id;
+  let userID = req.session.user_id;
   if (!userID) {
     res.statusCode = 401;
     res.end("UNAUTHORIZED ACCESS. PLEASE LOGIN")
@@ -155,7 +155,7 @@ app.post("/urls/:shortURL", (req, res) => {
 
 // cookie:
 app.get("/login", (req, res) => {
-  let userID = req.cookies.user_id;
+  let userID = req.session.user_id;
   let templateVars = {
     user: users[userID]
   }
@@ -178,14 +178,14 @@ app.post("/login", (req, res) => {
       res.end("ERROR: 403. WRONG PASSWORD!")
       return;
     } else {
-      res.cookie("user_id", users[userID]["id"])
+      res.session.users[userID]["id"];
     }
   res.redirect("/urls")
 });
 
 app.post("/logout", (req, res) => {
-  let userID = req.cookies.user_id;
-  res.clearCookie('user_id', req.cookies[userID]);
+  // let userID = req.session.user_id;
+  req.session.user_id = null;
   // console.log(users)
   res.redirect("/urls");
 })
@@ -214,7 +214,7 @@ function emailFinder(userObject, email) {
   let objFilter = Object.values(userObject);
   for (user of objFilter) {
     if (user.email === email) {
-      return true;
+      return user;
     }
   }
   return false;
