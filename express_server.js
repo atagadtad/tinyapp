@@ -20,6 +20,8 @@ app.use(cookieSession({
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
+app.set('trust proxy', 1)
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
@@ -79,8 +81,9 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${temporaryString}`);
 });
 
-app.get("/u/:shortURL", (req, res) => {
+app.get("/u/:shortURL", (req, res, next) => {
   const longURL = urlDatabase[req.params.shortURL]['longURL'];
+  req.session.views = (req.session.views || 0) + 1
   res.redirect(longURL);
 });
 
@@ -110,7 +113,8 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]['longURL'],
-    user: users[userID]
+    user: users[userID],
+    views: req.session.views + ' views'
   };
   res.render("urls_show", templateVars);
 });
