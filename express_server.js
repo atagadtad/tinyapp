@@ -2,14 +2,10 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
-// const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session')
 const bcrypt = require('bcrypt');
+const { emailFinder } = require('./helpers');
 
-// const password = "purple-monkey-dinosaur";
-// const hashedPassword = bcrypt.hashSync(password, 10);
-// console.log(hashedPassword);
-// app.use(cookieParser());
 
 app.use(cookieSession({
   name: 'user_id',
@@ -209,16 +205,7 @@ function generatedRandomString() {
   return sixString;
 };
 
-// true if it finds matching email, false if it doesn't
-function emailFinder(userObject, email) {
-  let objFilter = Object.values(userObject);
-  for (user of objFilter) {
-    if (user.email === email) {
-      return user;
-    }
-  }
-  return false;
-};
+
 
 function idFinder(userObject, email) {
   let objFilter = Object.values(Object.values(userObject))
