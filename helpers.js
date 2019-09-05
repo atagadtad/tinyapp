@@ -1,12 +1,12 @@
 
-function emailFinder(userObject, email) {
+function getUserByEmail(email, userObject) {
   let objFilter = Object.values(userObject);
   for (user of objFilter) {
     if (user.email === email) {
-      return user;
+      return user.id;
     }
   }
   return false;
 };
 
-module.exports = { emailFinder }
+module.exports = { getUserByEmail }

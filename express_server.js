@@ -4,7 +4,7 @@ const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session')
 const bcrypt = require('bcrypt');
-const { emailFinder } = require('./helpers');
+const { getUserByEmail } = require('./helpers');
 
 
 app.use(cookieSession({
@@ -24,10 +24,10 @@ const urlDatabase = {
 
 
 const users = {
-  "aJ48lW": {
+  "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "asdf"
+    password: "purple-monkey-dinosaur"
   },
   "user2RandomID": {
     id: "user2RandomID",
@@ -117,7 +117,7 @@ app.post("/register", (req, res) => {
     res.end("ERROR 400, PLEASE INPUT VALID EMAIL AND/OR PASSWORD")
     return;
   }
-  if (emailFinder(users, userEmail)) {
+  if (getUserByEmail(userEmail, users)) {
     res.statusCode = 400;
     res.end("EMAIL ALREADY FOUND IN DATABASE!")
     return;
@@ -164,11 +164,11 @@ app.post("/login", (req, res) => {
   let userID = idFinder(users, userEmail);
   let userPWD = req.body.password;
 
-  if (!emailFinder(users, userEmail)) {
+  if (!getUserByEmail(userEmail, users)) {
     res.statusCode = 403;
     res.end("ERROR: 403. EMAIL NOT FOUND!")
     return;
-  } else if (emailFinder(users, userEmail))
+  } else if (getUserByEmail(userEmail, users))
     if (!bcrypt.compareSync(userPWD, users[userID].password)) {
       res.statusCode = 403;
       res.end("ERROR: 403. WRONG PASSWORD!")
