@@ -66,7 +66,7 @@ app.post("/urls", (req, res) => {
   let temporaryString = generatedRandomString()
   urlDatabase[temporaryString] = { longURL: req.body.longURL, userID: userID };
   res.redirect(`/urls/${temporaryString}`)
-  console.log(urlDatabase)
+  // console.log(urlDatabase)
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -91,7 +91,7 @@ app.get("/urls/new", (req, res) => {
 // cookie:
 app.get("/urls/:shortURL", (req, res) => {
   let userID = req.session.user_id;
-  console.log(req.params)
+  // console.log(req.params)
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]['longURL'],
@@ -106,7 +106,7 @@ app.get("/register", (req, res) => {
   let templateVars = {
     user: users[userID]
   }
-  console.log(req.body);
+  // console.log(req.body);
   res.render("urls_registration", templateVars)
 })
 
@@ -148,8 +148,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL
   let longURL = req.body.longURL
-  console.log(shortURL)
-  console.log(longURL)
   urlDatabase[shortURL] = longURL;
   res.redirect(`/urls/${shortURL}`);
 })
@@ -172,6 +170,9 @@ app.post("/login", (req, res) => {
   if (!getUserByEmail(userEmail, users)) {
     res.statusCode = 403;
     res.end("ERROR: 403. EMAIL NOT FOUND!")
+    console.log(getUserByEmail('user2@example.com', users))
+    console.log(getUserByEmail(userEmail, users))
+    // console.log(users)
     return;
   } else if (getUserByEmail(userEmail, users))
     if (!bcrypt.compareSync(userPWD, users[userID].password)) {
@@ -179,15 +180,16 @@ app.post("/login", (req, res) => {
       res.end("ERROR: 403. WRONG PASSWORD!")
       return;
     } else {
-      res.session.users[userID]["id"];
+      req.session.user_id = getUserByEmail(userEmail, users);
     }
   res.redirect("/urls")
 });
 
 app.post("/logout", (req, res) => {
   // let userID = req.session.user_id;
-  req.session.user_id = null;
-  // console.log(users)
+  res.clearCookie('user_id');
+  res.clearCookie('user_id.sig');
+  console.log(users)
   res.redirect("/urls");
 })
 
