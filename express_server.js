@@ -3,6 +3,11 @@ const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
+
+// const password = "purple-monkey-dinosaur";
+// const hashedPassword = bcrypt.hashSync(password, 10);
+// console.log(hashedPassword);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
@@ -99,9 +104,10 @@ app.get("/register", (req, res) => {
 
 // created cookie:
 app.post("/register", (req, res) => {
-  let randomID = generatedRandomString();
-  let userEmail = req.body.email;
-  let userPassword = req.body.password;
+  const randomID = generatedRandomString();
+  const userEmail = req.body.email;
+  const userPassword = req.body.password;
+  const hashedPassword = bcrypt.hashSync(userPassword, 10);
 
   if (userEmail === '' || userPassword === '') {
     res.statusCode = 400;
@@ -114,7 +120,7 @@ app.post("/register", (req, res) => {
     return;
   }
   res.cookie("user_id", randomID)
-  users[randomID] = { id: randomID, email: userEmail, password: userPassword }
+  users[randomID] = { id: randomID, email: userEmail, password: hashedPassword }
   // console.log(users)
   res.redirect("/urls")
 })
@@ -159,14 +165,13 @@ app.post("/login", (req, res) => {
     res.end("ERROR: 403. EMAIL NOT FOUND!")
     return;
   } else if (emailFinder(users, userEmail))
-    if (users[userID].password !== userPWD) {
+    if (!bcrypt.compareSync(userPWD, users[userID].password)) {
       res.statusCode = 403;
       res.end("ERROR: 403. WRONG PASSWORD!")
       return;
     } else {
       res.cookie("user_id", users[userID]["id"])
     }
-
   res.redirect("/urls")
 });
 
