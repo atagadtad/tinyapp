@@ -80,6 +80,11 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     user: users[userID]
   }
+  if (!userID) {
+    res.statusCode = 401;
+    res.redirect('/urls')
+    return;
+  }
   res.render("urls_new", templateVars);
 })
 
