@@ -21,9 +21,13 @@
           <%if (user) {%>
         <form method="POST" action="/logout">
           <div>
-            <button type="submit" class="btn btn-secondary"> Logout
+            <button type="submit" class="btn btn-primary"> Logout
             </button>
-            <%= user.email %>
+            <div class="badge badge-success text-wrap" style="width: 11rem;">
+
+              <%=user.email%>
+
+            </div>
           </div>
         </form>
         <%}%>

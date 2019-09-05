@@ -4,6 +4,8 @@ const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
+
+// helper functions:
 const { getUserByEmail,
   generatedRandomString,
   idFinder,
@@ -50,8 +52,6 @@ app.get("/", (req, res) => {
   }
 });
 
-// when asked for /urls.json in the browser, server responeds with the
-// .json of the urlDatabase object
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
@@ -120,7 +120,7 @@ app.get("/register", (req, res) => {
   let templateVars = {
     user: users[userID]
   };
-  // console.log(req.body);
+
   res.render("urls_registration", templateVars);
 });
 
@@ -143,7 +143,6 @@ app.post("/register", (req, res) => {
   }
   req.session.user_id = randomID;
   users[randomID] = { id: randomID, email: userEmail, password: hashedPassword };
-  // console.log(users)
   res.redirect("/urls");
 });
 
@@ -184,10 +183,8 @@ app.post("/login", (req, res) => {
   if (!getUserByEmail(userEmail, users)) {
     res.statusCode = 403;
     res.end("ERROR: 403. EMAIL NOT FOUND!");
-    console.log(getUserByEmail('user2@example.com', users));
-    console.log(getUserByEmail(userEmail, users));
-    // console.log(users)
     return;
+
   } else if (getUserByEmail(userEmail, users))
     if (!bcrypt.compareSync(userPWD, users[userID].password)) {
       res.statusCode = 403;
@@ -203,14 +200,9 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
   res.clearCookie('user_id.sig');
-  console.log(users);
   res.redirect("/urls");
 });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-
-
-
