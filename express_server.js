@@ -43,6 +43,7 @@ app.get("/hello", (req, res) => {
 
 //cookie:
 app.get("/urls", (req, res) => {
+  let userObj = {}
   let userID = req.cookies.user_id;
   let templateVars = {
     urls: urlsForUser(userID),
@@ -119,7 +120,14 @@ app.post("/register", (req, res) => {
 })
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
+  let userID = req.cookies.user_id;
+  if (!userID) {
+    res.statusCode = 401;
+    res.end("UNAUTHORIZED ACCESS. PLEASE LOGIN")
+    return;
+  } else {
+    delete urlDatabase[req.params.shortURL];
+  }
   res.redirect("/urls");
 })
 
@@ -209,14 +217,13 @@ function idFinder(userObject, email) {
 };
 
 function urlsForUser(id) {
-  let urlArray = [];
-  let urlFilter = Object.values(urlDatabase);
-  for (url of urlFilter) {
-    if (url.userID === id) {
-      urlArray.push(url.longURL)
+  let urlObj = {};
+  for (shortURL in urlDatabase) {
+    if (urlDatabase[shortURL]['userID'] === id) {
+      urlObj[shortURL] = urlDatabase[shortURL]['longURL'];
     }
   }
-  return urlArray;
-}
+  return urlObj;
+};
 
 // console.log(urlsForUser("aJ48lW"))
