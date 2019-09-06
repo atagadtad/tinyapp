@@ -5,7 +5,6 @@ TinyApp is a full stack web application built with Node and Express that allows 
 ## Final Product
 
 !["URLS page"](https://github.com/atagadtad/tinyapp/blob/master/docs/:myURLS.png?raw=true)
-!["Create new shortURL"](https://github.com/atagadtad/tinyapp/blob/master/docs/:urls:short.png?raw=true)
 !["View coutner below URL page"](https://github.com/atagadtad/tinyapp/blob/master/docs/urls%20with%20views.png?raw=true)
 
 ## Dependencies
