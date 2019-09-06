@@ -81,11 +81,14 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${temporaryString}`);
 });
 
+// set a cookie here to count views:
 app.get("/u/:shortURL", (req, res, next) => {
+  let userID = req.session.user_id;
   const longURL = urlDatabase[req.params.shortURL]['longURL'];
+  // this cookie for general views of the link:
   req.session.views = (req.session.views || 0) + 1
   urlDatabase[req.params.shortURL]['views'] = req.session.views;
-  console.log(urlDatabase);
+
   res.redirect(longURL);
 });
 
@@ -112,6 +115,7 @@ app.get("/urls/:shortURL", (req, res) => {
     res.end("UNAUTHORIZED ACCESS.");
     return;
   }
+
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]['longURL'],
