@@ -84,6 +84,8 @@ app.post("/urls", (req, res) => {
 app.get("/u/:shortURL", (req, res, next) => {
   const longURL = urlDatabase[req.params.shortURL]['longURL'];
   req.session.views = (req.session.views || 0) + 1
+  urlDatabase[req.params.shortURL]['views'] = req.session.views;
+  console.log(urlDatabase);
   res.redirect(longURL);
 });
 
@@ -114,7 +116,7 @@ app.get("/urls/:shortURL", (req, res) => {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]['longURL'],
     user: users[userID],
-    views: req.session.views + ' views'
+    views: urlDatabase[shortURL]['views'] + ' views',
   };
   res.render("urls_show", templateVars);
 });
